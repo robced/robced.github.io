@@ -9,71 +9,66 @@
 <body class="flex flex-col items-center justify-center p-4">
 
 <!-- COUNTDOWN + PROGRESS in one responsive box -->
-<div id="widget" class="flex flex-col items-center gap-4 w-fit px-6 py-4">
-
+<div id="widget" class="flex flex-col items-center gap-4 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg
+                       px-6 py-4 rounded-xl
+                       text-gray-900
+                       dark:text-gray-100">
     <!-- COUNTERS -->
-    <div class="flex flex-row gap-6 text-center">
-        <div class="flex flex-col w-24">
-            <span id="years"  class="text-[3em] font-bold leading-none">00</span>
+    <div class="flex flex-row justify-center gap-6 text-center w-full">
+        <div class="flex flex-col flex-1">
+            <span id="years"  class="text-[2.5em] font-extrabold leading-none">00</span>
             <span class="text-xs tracking-wider">YEARS</span>
         </div>
-        <div class="flex flex-col w-24">
-            <span id="months" class="text-[3em] font-bold leading-none">00</span>
+        <div class="flex flex-col flex-1">
+            <span id="months" class="text-[2.5em] font-extrabold leading-none">00</span>
             <span class="text-xs tracking-wider">MONTHS</span>
         </div>
-        <div class="flex flex-col w-24">
-            <span id="days"   class="text-[3em] font-bold leading-none">00</span>
+        <div class="flex flex-col flex-1">
+            <span id="days"   class="text-[2.5em] font-extrabold leading-none">00</span>
             <span class="text-xs tracking-wider">DAYS</span>
         </div>
     </div>
 
     <!-- PROGRESS BAR -->
-    <div class="w-full h-2.5 bg-gray-300 rounded-full overflow-hidden">
-        <div id="progressBar" class="h-full bg-purple-500" style="width:0%"></div>
+    <div class="w-full h-2.5 bg-gray-300 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div id="progressBar" class="h-full bg-orange-500 dark:bg-teal-400" style="width:0%"></div>
     </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        /* === CONFIG === */
         const startDate = new Date("2025-08-05T00:00:00");
         const gradDate  = new Date("2029-04-23T00:00:00");
         const MS_DAY    = 86_400_000;
         const totalDays = Math.floor((gradDate - startDate) / MS_DAY);
 
-        /* helper → total calendar-months difference */
-        function diffInMonths(from, to){
-            return (to.getFullYear() - from.getFullYear())*12 + (to.getMonth() - from.getMonth());
-        }
+        const diffInMonths = (from, to) => (to.getFullYear()-from.getFullYear())*12 + (to.getMonth()-from.getMonth());
 
-        function update(){
+        function update() {
             const now = new Date();
-            const remainingMs  = Math.max(0, gradDate - now);
-            const monthsTotal  = Math.max(0, diffInMonths(now, gradDate));
-            const yearsLeft    = Math.floor(monthsTotal / 12);
-            const monthsLeft   = monthsTotal % 12;
+            const remainingMs = Math.max(0, gradDate - now);
+            const monthsTotal = Math.max(0, diffInMonths(now, gradDate));
+            const yearsLeft   = Math.floor(monthsTotal / 12);
+            const monthsLeft  = monthsTotal % 12;
 
-            /* find day remainder accurately */
             let pivot = new Date(now);
             pivot.setFullYear(pivot.getFullYear() + yearsLeft);
             pivot.setMonth(pivot.getMonth() + monthsLeft);
             if (pivot > gradDate) pivot = gradDate;
             const daysLeft = Math.ceil((gradDate - pivot) / MS_DAY);
 
-            /* DOM updates */
-            document.getElementById("years").textContent  = String(yearsLeft).padStart(2,"0");
-            document.getElementById("months").textContent = String(monthsLeft).padStart(2,"0");
-            document.getElementById("days").textContent   = String(daysLeft).padStart(2,"0");
+            document.getElementById("years").textContent  = String(yearsLeft).padStart(2, "0");
+            document.getElementById("months").textContent = String(monthsLeft).padStart(2, "0");
+            document.getElementById("days").textContent   = String(daysLeft).padStart(2, "0");
 
-            /* progress bar */
             const doneDays = totalDays - Math.floor((gradDate - now) / MS_DAY);
             const pct = Math.min(100, (doneDays / totalDays) * 100);
             document.getElementById("progressBar").style.width = pct + "%";
             document.getElementById("percentLabel").textContent = pct.toFixed(1) + " %";
         }
 
-        update();                  // run once on load
-        setInterval(update, 60_000); // refresh every minute
+        update();
+        setInterval(update, 60_000);
     });
 </script>
 </body>
